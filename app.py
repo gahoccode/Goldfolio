@@ -1,5 +1,5 @@
 import pandas as pd
-import numpy as np
+
 
 fileName = "Gold Price.csv"
 Price = pd.read_csv(fileName)
