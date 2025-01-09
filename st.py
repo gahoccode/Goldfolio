@@ -30,6 +30,11 @@ Mean_Return = Returns.mean()
 Std_Dev = Returns.std()
 Sharpe_Ratio = (Mean_Return - RiskFreeRate) / Std_Dev
 
+# Calculate VaR and CVaR (95% confidence level)
+confidence_level = 0.95
+VaR = np.percentile(Returns, (1 - confidence_level) * 100)
+CVaR = Returns[Returns <= VaR].mean()
+
 # Main App
 st.title("Gold Price Analysis Dashboard")
 
@@ -44,10 +49,29 @@ st.dataframe(display_df)
 
 # Key Metrics (matching app.py output)
 st.header("Performance Metrics")
+
+# First row of metrics
 col1, col2, col3 = st.columns(3)
 col1.metric("Mean Return", f"{Mean_Return*100:.2f}%")
 col2.metric("Standard Deviation", f"{Std_Dev:.2f}")
 col3.metric("Sharpe Ratio", f"{Sharpe_Ratio:.2f}")
+
+# Risk metrics row
+st.subheader("Risk Metrics (95% Confidence Level)")
+st.markdown("""
+Value at Risk (VaR) and Conditional Value at Risk (CVaR) are calculated at a 95% confidence level:
+- **VaR (95%)**: The maximum loss expected over a given period at 95% confidence level
+- **CVaR (95%)**: The average loss in the worst 5% of cases (also known as Expected Shortfall)
+""")
+
+risk_col1, risk_col2, risk_col3 = st.columns(3)
+risk_col1.metric("Value at Risk (95%)", f"{-VaR*100:.2f}%")
+risk_col2.metric("Conditional VaR (95%)", f"{-CVaR*100:.2f}%")
+risk_col3.metric(
+    "Confidence Level",
+    f"{confidence_level*100:.0f}%",
+    help="VaR and CVaR are calculated at 95% confidence level"
+)
 
 # Risk Free Rate Display
 st.header("Assumptions")
@@ -102,9 +126,14 @@ Analysis covers gold closing prices from 2000 to 2024
 
 ### Analysis Details
 This dashboard visualizes:
-- Mean return
-- Standard deviation
+- Mean return and volatility
 - Sharpe ratio
+- Value at Risk (VaR)
+- Conditional Value at Risk (CVaR)
 - Price trends
 - Returns analysis
+
+### Risk Metrics Info
+- VaR: Maximum expected loss at 95% confidence
+- CVaR: Average loss beyond VaR threshold
 """)
